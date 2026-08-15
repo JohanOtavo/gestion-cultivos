@@ -15,7 +15,12 @@ Cada rama corresponde a un requerimiento del SRS y sigue la convención
 | `feature/RF1-gestion-fincas` | RF1 a RF4 | Modelo de finca y lote, esquemas, CRUD completo y pruebas. | Fusionada |
 | `feature/RF33-diagnostico-fitosanitario` | RF33, RF35, RF36 | Envoltura del modelo de visión artificial, carga de imagen, historial y pruebas. | Fusionada |
 | `feature/RF39-datos-meteorologicos` | RF39 | Cliente de OpenWeather con reintentos. | En desarrollo |
-| `docs/flujo-de-trabajo` | — | Documentación de este flujo. | En revisión |
+| `docs/flujo-de-trabajo` | — | Documentación de este flujo. | Fusionada |
+| `fix/ci-pruebas-por-microservicio` | — | Corrige la recolección de pruebas del pipeline y unifica el límite de línea. | Fusionada |
+| `fix/ci-instala-dependencias-de-cada-servicio` | — | El pipeline instala el `requirements.txt` de cada servicio. | Fusionada |
+
+El repositorio remoto está en
+<https://github.com/JohanOtavo/gestion-cultivos>.
 
 ## 2. Ciclo que sigue cada cambio
 
@@ -78,3 +83,23 @@ git log --oneline --grep="RF1"       # todo lo hecho para un requerimiento
 git blame services/fincas-cultivos/app/rutas/fincas.py   # autor de cada línea
 git branch -a                        # ramas locales y remotas
 ```
+
+## 6. Las dos correcciones que encontró el pipeline
+
+Vale la pena dejarlas registradas, porque son justamente lo que la integración
+continua debe atrapar antes de un merge:
+
+1. **`fix/ci-pruebas-por-microservicio`** — el pipeline corría `pytest` desde la
+   raíz y fallaba en la recolección: los nueve servicios tienen un paquete `app`
+   y Python no puede importar dos con el mismo nombre en la misma sesión.
+   Además Black usaba 88 columnas y Flake8 exigía 100, así que el paso de estilo
+   se contradecía consigo mismo.
+
+2. **`fix/ci-instala-dependencias-de-cada-servicio`** — el workflow instalaba una
+   lista de paquetes escrita a mano que no incluía `python-multipart`. Las
+   pruebas del diagnóstico pasaban en local y fallaban en el servidor. Ahora se
+   instala el `requirements.txt` de cada servicio, de modo que la lista de
+   dependencias vive en un solo lugar.
+
+El segundo caso es el ejemplo exacto del "en mi máquina funciona" que la
+integración continua existe para evitar.
