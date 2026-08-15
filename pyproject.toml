@@ -1,0 +1,10 @@
+# Configuracion del estandar de codificacion del backend.
+# Black formatea y Flake8 verifica; ambos usan el mismo limite de linea
+# para que no se contradigan dentro del pipeline.
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
