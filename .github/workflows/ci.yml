@@ -30,8 +30,18 @@ jobs:
           black --check services/ gateway/
           flake8 --max-line-length=100 services/ gateway/
 
-      - name: Ejecutar las pruebas
-        run: pytest -v
+      - name: Ejecutar las pruebas de cada microservicio
+        run: |
+          # Cada servicio es un proyecto independiente y todos tienen un
+          # paquete llamado app, por lo que no se pueden recolectar juntos:
+          # el primero que se importa deja ocupado el nombre para los demas.
+          for servicio in services/*/; do
+            if [ -n "$(ls -A "$servicio"tests 2>/dev/null)" ]; then
+              echo "::group::Pruebas de $(basename "$servicio")"
+              (cd "$servicio" && python -m pytest -q)
+              echo "::endgroup::"
+            fi
+          done
 
   construir-imagenes:
     name: Construcción de imágenes Docker

@@ -19,9 +19,7 @@ def cliente():
 
 
 def test_diagnostico_devuelve_resultado_confianza_y_recomendacion(cliente):
-    respuesta = cliente.post(
-        "/diagnosticos", params={"id_cultivo": 1}, files={"imagen": IMAGEN}
-    )
+    respuesta = cliente.post("/diagnosticos", params={"id_cultivo": 1}, files={"imagen": IMAGEN})
 
     assert respuesta.status_code == 201
     cuerpo = respuesta.json()
