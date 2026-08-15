@@ -1,0 +1,93 @@
+# Orquestacion del entorno de desarrollo (RF109).
+# Levanta la API Gateway, los nueve microservicios y PostgreSQL local.
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - datos_postgres:/var/lib/postgresql/data
+    networks: [interna]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
+
+  api-gateway:
+    build: ./gateway
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on: [auth-usuarios, fincas-cultivos]
+    networks: [interna]
+
+  auth-usuarios:
+    build: ./services/auth-usuarios
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  fincas-cultivos:
+    build: ./services/fincas-cultivos
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  gestion-agricola:
+    build: ./services/gestion-agricola
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  tareas-labores:
+    build: ./services/tareas-labores
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  monitoreo-clima:
+    build: ./services/monitoreo-clima
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  diagnostico-ia:
+    build: ./services/diagnostico-ia
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  reportes-analitica:
+    build: ./services/reportes-analitica
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  alertas-notificaciones:
+    build: ./services/alertas-notificaciones
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [interna]
+
+  archivos-imagenes:
+    build: ./services/archivos-imagenes
+    env_file: .env
+    networks: [interna]
+
+networks:
+  interna:
+    driver: bridge
+
+volumes:
+  datos_postgres:
