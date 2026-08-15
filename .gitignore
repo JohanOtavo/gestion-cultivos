@@ -1,0 +1,28 @@
+# Entorno
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Node / React
+node_modules/
+dist/
+build/
+
+# Editor y sistema
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Modelos e imagenes locales
+*.h5
+*.keras
+uploads/

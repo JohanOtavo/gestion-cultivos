@@ -1,0 +1,51 @@
+name: Integración continua
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verificar:
+    name: Estilo y pruebas
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install black flake8 pytest httpx fastapi sqlalchemy pydantic
+
+      - name: Verificar el estándar de codificación
+        run: |
+          black --check services/ gateway/
+          flake8 --max-line-length=100 services/ gateway/
+
+      - name: Ejecutar las pruebas
+        run: pytest -v
+
+  construir-imagenes:
+    name: Construcción de imágenes Docker
+    runs-on: ubuntu-latest
+    needs: verificar
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir la imagen de cada microservicio
+        run: |
+          for servicio in services/*/; do
+            nombre=$(basename "$servicio")
+            echo "Construyendo $nombre"
+            docker build -t "gestion-cultivos/$nombre:${{ github.sha }}" "$servicio"
+          done
+          docker build -t "gestion-cultivos/api-gateway:${{ github.sha }}" gateway/
