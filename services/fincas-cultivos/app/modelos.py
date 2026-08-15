@@ -1,6 +1,6 @@
 """Modelos del dominio de fincas, lotes y cultivos."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -24,7 +24,9 @@ class Finca(Base):
     unidad_area: Mapped[str] = mapped_column(String(20), default="hectarea")
     id_propietario: Mapped[int] = mapped_column(nullable=False)
     activa: Mapped[bool] = mapped_column(Boolean, default=True)
-    fecha_creacion: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    fecha_creacion: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
 
     lotes: Mapped[list["Lote"]] = relationship(back_populates="finca")
 
