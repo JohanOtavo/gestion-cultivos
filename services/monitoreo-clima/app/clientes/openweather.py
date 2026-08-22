@@ -52,11 +52,25 @@ class ClienteOpenWeather:
 
     @staticmethod
     def _normalizar(datos: dict) -> dict:
-        """Deja solo las variables que pide el RF39."""
+        """Deja solo las variables que pide el RF39.
+
+        Las horas de sol se calculan como la diferencia entre el amanecer y el
+        atardecer que reporta el proveedor. El indice ultravioleta solo viene
+        en el plan que incluye One Call, asi que puede llegar vacio.
+        """
         principal = datos.get("main", {})
+        sistema = datos.get("sys", {})
+
+        horas_sol = None
+        amanecer, atardecer = sistema.get("sunrise"), sistema.get("sunset")
+        if amanecer and atardecer and atardecer > amanecer:
+            horas_sol = round((atardecer - amanecer) / 3600, 2)
+
         return {
             "temperatura": principal.get("temp"),
             "presion_atmosferica": principal.get("pressure"),
             "humedad": principal.get("humidity"),
             "precipitacion": datos.get("rain", {}).get("1h", 0.0),
+            "indice_ultravioleta": datos.get("uvi"),
+            "horas_sol": horas_sol,
         }
