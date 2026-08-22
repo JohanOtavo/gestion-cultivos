@@ -1,0 +1,11 @@
+# Revisores por defecto de cualquier cambio.
+# GitHub los solicita automaticamente al abrir un Pull Request, de modo que
+# ningun cambio llega a main sin que otro integrante lo haya leido.
+
+*                       @JohanOtavo
+
+# Cada dominio lo revisa preferiblemente quien no lo escribio.
+/services/fincas-cultivos/      @JohanOtavo
+/services/diagnostico-ia/       @JohanOtavo
+/services/monitoreo-clima/      @JohanOtavo
+/.github/                       @JohanOtavo
