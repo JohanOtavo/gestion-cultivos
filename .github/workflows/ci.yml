@@ -20,18 +20,30 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Instalar dependencias
+      - name: Instalar las herramientas de estilo
         run: |
           python -m pip install --upgrade pip
-          pip install black flake8 pytest httpx fastapi sqlalchemy pydantic
+          pip install black flake8
 
       - name: Verificar el estándar de codificación
         run: |
           black --check services/ gateway/
           flake8 --max-line-length=100 services/ gateway/
 
-      - name: Ejecutar las pruebas
-        run: pytest -v
+      - name: Ejecutar las pruebas de cada microservicio
+        run: |
+          # Cada servicio es un proyecto independiente: se instalan sus propias
+          # dependencias y sus pruebas se corren dentro de su carpeta. No se
+          # pueden recolectar juntas porque los nueve tienen un paquete app y
+          # el primero que se importa deja ocupado el nombre para los demas.
+          for servicio in services/*/; do
+            if [ -n "$(ls -A "$servicio"tests 2>/dev/null)" ]; then
+              echo "::group::Pruebas de $(basename "$servicio")"
+              pip install --quiet -r "$servicio"requirements.txt
+              (cd "$servicio" && python -m pytest -q)
+              echo "::endgroup::"
+            fi
+          done
 
   construir-imagenes:
     name: Construcción de imágenes Docker
