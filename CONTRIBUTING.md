@@ -59,12 +59,45 @@ Reglas prácticas:
 ## 3. Pull Request y revisión de pares
 
 1. Se sube la rama con `git push -u origin feature/RFx-descripcion`.
-2. Se abre el Pull Request hacia `main` describiendo qué RF implementa.
+2. Se abre el Pull Request hacia `main`. La plantilla se llena sola con las
+   preguntas que debe responder el autor.
 3. **Otro integrante** revisa el cambio. El autor no aprueba su propio PR.
-4. El revisor verifica: que cumpla el requerimiento del SRS, que respete el estándar
-   de codificación y que incluya pruebas.
-5. Con la aprobación se fusiona usando *merge commit* (`--no-ff`), para que el
+4. Con la aprobación se fusiona usando *merge commit* (`--no-ff`), para que el
    historial conserve visible la rama de dónde vino el cambio.
+
+### Qué mira el revisor
+
+No se trata de leer el código por encima y aprobar. El revisor responde cuatro
+preguntas concretas, que son las de la plantilla:
+
+| Pregunta | Qué significa aprobar |
+|---|---|
+| ¿Cumple el requerimiento? | Se abre el SRS y se compara contra lo que dice el RF |
+| ¿Respeta el estándar? | `black` y `flake8` pasan y los nombres siguen la convención |
+| ¿Tiene pruebas? | Cubren el camino principal y al menos un caso de error |
+| ¿Se entiende? | Los nombres y comentarios se entienden sin preguntarle al autor |
+
+Si algo no cumple, se comenta en la línea concreta del Pull Request y se
+devuelve al autor. Pedir cambios no es un reproche: es más barato corregir en
+la revisión que después de que el código entró a `main`.
+
+### Rotación de revisores
+
+Revisa quien **no** escribió el cambio. El archivo `.github/CODEOWNERS` hace que
+GitHub proponga revisor automáticamente al abrir el Pull Request.
+
+## 3.1. Verificaciones automáticas antes del commit
+
+Para no descubrir en el servidor algo que se podía ver en la máquina propia,
+cada integrante instala los hooks una sola vez:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+A partir de ahí, cada `git commit` corre el formato, el análisis de estilo, la
+detección de llaves privadas y el bloqueo de commits directos a `main`.
 
 ## 4. Estándar de codificación
 
