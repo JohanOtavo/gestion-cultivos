@@ -78,8 +78,12 @@ Antes de subir cambios:
 ```bash
 black services/ gateway/
 flake8 services/ gateway/
-pytest
+cd services/<el-servicio-que-tocaste> && pytest
 ```
+
+Las pruebas se ejecutan **dentro de cada servicio**, no desde la raíz: los nueve
+tienen un paquete llamado `app` y Python no puede importar dos con el mismo nombre
+en la misma sesión. El pipeline hace lo mismo, servicio por servicio.
 
 ## 5. Qué nunca se sube
 
